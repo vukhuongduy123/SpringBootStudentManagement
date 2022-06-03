@@ -10,5 +10,4 @@ public interface StudentRepository extends JpaRepository<Student,Integer> {
     List<Student> findByDepartmentId(int departmentId);
     @Query("select count(S.id) from Student as S")
     int countAllId();
-
 }

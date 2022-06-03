@@ -69,7 +69,6 @@ public class CourseController {
                 : ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseObject(course, "Course's not existed",
                         ResponseObject.Status.STATUS_FAILED));
-
     }
 
     @DeleteMapping("deleteCourseById/{id}")

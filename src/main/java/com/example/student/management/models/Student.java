@@ -1,8 +1,6 @@
 package com.example.student.management.models;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.sql.Date;
 
 @Entity
@@ -16,7 +14,7 @@ public class Student {
     @Column(nullable = false, unique = false,length = 64)
     private Date dob;
 
-    @Column(nullable = false, unique = false)
+    @JoinColumn(nullable = false, unique = false)
     private int departmentId;
 
     public Student() {}
