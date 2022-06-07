@@ -4,6 +4,10 @@ import javax.persistence.*;
 import java.sql.Date;
 
 @Entity
+@NamedStoredProcedureQuery(
+        name = "CountStudentsFromDeparted",
+        procedureName = "dbo.CountStudentsFromDeparted",
+        parameters = {@StoredProcedureParameter(mode = ParameterMode.IN, type = Integer.class, name = "departmentId")})
 public class Student {
     @Id
     private int id;

@@ -6,6 +6,7 @@ import com.example.student.management.repositories.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,9 +21,8 @@ public class StudentController {
     @GetMapping("/getAllStudents")
     ResponseEntity<ResponseObject> getAllStudents() {
         List<Student> students = studentRepository.findAll();
-
         return students.isEmpty() ? ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject("", "There aren't any students", ResponseObject.Status.STATUS_OK))
+                new ResponseObject(students, "There aren't any students", ResponseObject.Status.STATUS_OK))
                 : ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseObject(students, "List of students", ResponseObject.Status.STATUS_OK));
     }
@@ -59,57 +59,40 @@ public class StudentController {
 
     @GetMapping("/countAllStudents")
     ResponseEntity<ResponseObject> countAllStudents(){
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(studentRepository.countAllId(),
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(studentRepository.countAll(),
                 "Number of students", ResponseObject.Status.STATUS_OK));
     }
 
     @GetMapping("/countStudentsFromDeparted/{id}")
-    ResponseEntity<ResponseObject> countStudentsFromDeparted(@PathVariable int id){
+    @Transactional(readOnly = true)
+    public ResponseEntity<ResponseObject> countStudentsFromDeparted(@PathVariable int id){
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(studentRepository.CountStudentsFromDeparted(id),
                 "Number of students", ResponseObject.Status.STATUS_OK));
     }
 
     @PostMapping("/insertStudent")
     ResponseEntity<ResponseObject> insertStudent(@RequestBody Student student) {
-        boolean isExistedDepartmentId = studentRepository.existsByDepartmentId(student.getDepartmentId());
-        if (!studentRepository.existsById(student.getId())  && isExistedDepartmentId) {
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(studentRepository.save(student),
-                    "Student's inserted", ResponseObject.Status.STATUS_OK));
-        }
-        if (!isExistedDepartmentId) {
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(student,
-                    "Student's department id is not exist", ResponseObject.Status.STATUS_FAILED));
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(student,
-                "Student's is already exist", ResponseObject.Status.STATUS_FAILED));
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(studentRepository.insert(
+                student.getId(), student.getName(), student.isGender(), student.getDob(), student.getDepartmentId()),
+                "Student's inserted", ResponseObject.Status.STATUS_OK));
     }
 
     @PutMapping("/updateStudent")
     ResponseEntity<ResponseObject> updateStudent(@RequestBody Student student) {
-        boolean isExistedDepartmentId = studentRepository.existsByDepartmentId(student.getDepartmentId());
-        if (studentRepository.existsById(student.getId())  && isExistedDepartmentId) {
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(studentRepository.save(student),
-                    "Student's updated", ResponseObject.Status.STATUS_OK));
-        }
-
-        if (!isExistedDepartmentId) {
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(student,
-                    "Student's department id is not exist", ResponseObject.Status.STATUS_FAILED));
-        }
-
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(student,
-                "Student's is not exist", ResponseObject.Status.STATUS_FAILED));
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(studentRepository.update(
+                student.getId(), student.getName(), student.isGender(), student.getDob(), student.getDepartmentId()),
+                "Student's updated", ResponseObject.Status.STATUS_OK));
 
     }
 
     @DeleteMapping("deleteStudentById/{id}")
     ResponseEntity<ResponseObject> deleteStudent(@PathVariable int id) {
-        if (studentRepository.existsById(id)) {
+        //if (studentRepository.existsById(id)) {
             studentRepository.deleteById(id);
             return ResponseEntity.status(HttpStatus.FOUND).body(
                     new ResponseObject("", "Student's deleted", ResponseObject.Status.STATUS_OK));
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                new ResponseObject("", "Student's not exist", ResponseObject.Status.STATUS_FAILED));
+        //}
+       // return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+               // new ResponseObject("", "Student's not exist", ResponseObject.Status.STATUS_FAILED));
     }
 }

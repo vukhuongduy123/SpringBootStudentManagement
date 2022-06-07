@@ -9,8 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface RegistryRepository extends JpaRepository<Registry,Integer> {
     @Modifying(clearAutomatically=true, flushAutomatically=true)
-    @Transactional
     @Query(value = "{call RegisterCourse(:studentId,:courseId)}",nativeQuery = true)
+    @Transactional
     int RegisterCourse(@Param("studentId") int studentId, @Param("courseId") int courseId);
 
 }

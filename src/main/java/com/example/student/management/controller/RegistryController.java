@@ -23,17 +23,12 @@ public class RegistryController {
     @PostMapping("/insertRegistry")
     ResponseEntity<ResponseObject> insert(@RequestBody Registry registry) {
         int res = registryRepository.RegisterCourse(registry.getStudentId(),registry.getCourseId());
-        System.out.println(res);
         if (res > 0) {
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject(registry, "Registry success", ResponseObject.Status.STATUS_OK));
         }
-
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseObject(registry, "Registry failed", ResponseObject.Status.STATUS_FAILED));
 
     }
-
-
-
 }

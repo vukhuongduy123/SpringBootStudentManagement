@@ -4,7 +4,7 @@ public class ResponseObject {
     private Status status;
     private String message;
     private Object data;
-    public enum Status{
+    public enum Status {
         STATUS_OK, STATUS_FAILED
     }
 
@@ -13,6 +13,7 @@ public class ResponseObject {
         this.message = message;
         this.status = status;
     }
+
 
     public Object getData() {
         return data;
