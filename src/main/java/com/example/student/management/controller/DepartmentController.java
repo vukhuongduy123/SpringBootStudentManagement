@@ -6,11 +6,10 @@ import com.example.student.management.repositories.DepartmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(path ="/api/department")
@@ -24,4 +23,60 @@ public class DepartmentController {
                 new ResponseObject(departmentRepository.findAll(), "List of departments", ResponseObject.Status.STATUS_OK));
     }
 
+    @GetMapping("/getDepartmentById/{id}")
+    ResponseEntity<ResponseObject> getDepartmentById(@PathVariable int id) {
+        Optional<Department> department = departmentRepository.findById(id);
+
+        return department.isPresent() ? ResponseEntity.status(HttpStatus.FOUND).body(
+                new ResponseObject(department, "Department found", ResponseObject.Status.STATUS_OK))
+                : ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new ResponseObject("", "Department not found", ResponseObject.Status.STATUS_FAILED));
+    }
+
+    @GetMapping("/getDepartmentByName/{name}")
+    ResponseEntity<ResponseObject> getDepartmentByName(@PathVariable String name) {
+        List<Department> department = departmentRepository.findByName(name);
+
+        return department.size() > 0 ? ResponseEntity.status(HttpStatus.FOUND).body(
+                new ResponseObject(department, "Departments found", ResponseObject.Status.STATUS_OK))
+                : ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new ResponseObject("", "Departments not found", ResponseObject.Status.STATUS_FAILED));
+    }
+
+    @GetMapping("/countAllDepartments")
+    ResponseEntity<ResponseObject> countAllDepartments(){
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseObject(departmentRepository.countAllId(),
+                        "Number of departments", ResponseObject.Status.STATUS_OK));
+    }
+
+    @PostMapping("/insertDepartment")
+    ResponseEntity<ResponseObject> insertDepartment(@RequestBody Department department) {
+        return departmentRepository.existsById(department.getId())
+                ? ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(departmentRepository.save(department),
+                        "Department's inserted", ResponseObject.Status.STATUS_OK))
+                : ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(department, "Department's already existed",
+                        ResponseObject.Status.STATUS_FAILED));
+    }
+
+    @PutMapping("/updateDepartment")
+    ResponseEntity<ResponseObject> updateDepartment(@RequestBody Department department) {
+        return departmentRepository.existsById(department.getId())
+                ? ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(departmentRepository.save(department),
+                "Department's updated", ResponseObject.Status.STATUS_OK))
+                : ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(department, "Department's not existed",
+                        ResponseObject.Status.STATUS_FAILED));
+    }
+
+    @DeleteMapping("deleteDepartmentById/{id}")
+    ResponseEntity<ResponseObject> deleteDepartment(@PathVariable int id) {
+        if (departmentRepository.existsById(id)) {
+            departmentRepository.deleteById(id);
+            return ResponseEntity.status(HttpStatus.FOUND).body(
+                    new ResponseObject(departmentRepository.findById(id), "Department's deleted",
+                            ResponseObject.Status.STATUS_OK));
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new ResponseObject("", "Department's not exist", ResponseObject.Status.STATUS_FAILED));
+    }
 }

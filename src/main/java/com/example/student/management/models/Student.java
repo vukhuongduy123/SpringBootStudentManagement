@@ -7,25 +7,16 @@ import java.sql.Date;
 public class Student {
     @Id
     private int id;
-    @Column(nullable = false, unique = false, length = 32)
+    @Column(nullable = false, length = 32)
     private String name;
-    @Column(nullable = false, unique = false)
+    @Column(nullable = false)
     private boolean gender;
-    @Column(nullable = false, unique = false,length = 64)
+    @Column(nullable = false, length = 64)
     private Date dob;
-
-    @JoinColumn(nullable = false, unique = false)
+    @JoinColumn(nullable = false)
     private int departmentId;
 
     public Student() {}
-
-    public Student(int id, String name, boolean gender, Date dob, int departmentId) {
-        this.id = id;
-        this.name = name;
-        this.gender = gender;
-        this.dob = dob;
-        this.departmentId = departmentId;
-    }
 
     public void setId(int id) {
         this.id = id;

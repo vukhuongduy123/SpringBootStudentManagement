@@ -48,7 +48,7 @@ public class StudentController {
     }
 
     @GetMapping("/getStudentByDepartmentId/{id}")
-    ResponseEntity<ResponseObject> getStudentByName(@PathVariable int id) {
+    ResponseEntity<ResponseObject> getStudentByDepartmentId(@PathVariable int id) {
         List<Student> students = studentRepository.findByDepartmentId(id);
 
         return students.size() > 0 ? ResponseEntity.status(HttpStatus.FOUND).body(
@@ -59,31 +59,46 @@ public class StudentController {
 
     @GetMapping("/countAllStudents")
     ResponseEntity<ResponseObject> countAllStudents(){
-        int numberOfStudents = studentRepository.countAllId();
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject(numberOfStudents, "Number of students", ResponseObject.Status.STATUS_OK));
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(studentRepository.countAllId(),
+                "Number of students", ResponseObject.Status.STATUS_OK));
+    }
+
+    @GetMapping("/countStudentsFromDeparted/{id}")
+    ResponseEntity<ResponseObject> countStudentsFromDeparted(@PathVariable int id){
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(studentRepository.CountStudentsFromDeparted(id),
+                "Number of students", ResponseObject.Status.STATUS_OK));
     }
 
     @PostMapping("/insertStudent")
     ResponseEntity<ResponseObject> insertStudent(@RequestBody Student student) {
-        return getStudentFromId(student.getId()).getBody().getStatus() == ResponseObject.Status.STATUS_FAILED ?
-                ResponseEntity.status(HttpStatus.OK).body(
-                        new ResponseObject(studentRepository.save(student), "Student's inserted",
-                                ResponseObject.Status.STATUS_OK))
-                : ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject(student, "Student's already existed",
-                        ResponseObject.Status.STATUS_FAILED));
+        boolean isExistedDepartmentId = studentRepository.existsByDepartmentId(student.getDepartmentId());
+        if (!studentRepository.existsById(student.getId())  && isExistedDepartmentId) {
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(studentRepository.save(student),
+                    "Student's inserted", ResponseObject.Status.STATUS_OK));
+        }
+        if (!isExistedDepartmentId) {
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(student,
+                    "Student's department id is not exist", ResponseObject.Status.STATUS_FAILED));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(student,
+                "Student's is already exist", ResponseObject.Status.STATUS_FAILED));
     }
 
     @PutMapping("/updateStudent")
     ResponseEntity<ResponseObject> updateStudent(@RequestBody Student student) {
-        return getStudentFromId(student.getId()).getBody().getStatus() == ResponseObject.Status.STATUS_OK ?
-                ResponseEntity.status(HttpStatus.OK).body(
-                        new ResponseObject(studentRepository.save(student), "Student's updated",
-                                ResponseObject.Status.STATUS_OK))
-                : ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject(student, "Student's not existed",
-                        ResponseObject.Status.STATUS_FAILED));
+        boolean isExistedDepartmentId = studentRepository.existsByDepartmentId(student.getDepartmentId());
+        if (studentRepository.existsById(student.getId())  && isExistedDepartmentId) {
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(studentRepository.save(student),
+                    "Student's updated", ResponseObject.Status.STATUS_OK));
+        }
+
+        if (!isExistedDepartmentId) {
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(student,
+                    "Student's department id is not exist", ResponseObject.Status.STATUS_FAILED));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(student,
+                "Student's is not exist", ResponseObject.Status.STATUS_FAILED));
 
     }
 

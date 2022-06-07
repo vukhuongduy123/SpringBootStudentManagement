@@ -3,30 +3,23 @@ package com.example.student.management.models;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import java.sql.Date;
 
 @Entity
 public class Course {
     @Id
     private int id;
-    @Column(nullable = false, unique = false, length = 32)
+    @Column(nullable = false, length = 32)
     private String name;
-    @Column(nullable = true, unique = false)
+    @Column()
     private Date startDay;
-    @Column(nullable = true, unique = false)
+    @Column()
     private Date endDay;
-    @Column(nullable = false,unique = false)
+    @JoinColumn(nullable = false)
     private int departmentId;
 
     public Course() {}
-
-    public Course(int id, String name, Date startDay, Date endDay, int departmentId) {
-        this.id = id;
-        this.name = name;
-        this.startDay = startDay;
-        this.endDay = endDay;
-        this.departmentId = departmentId;
-    }
 
     public int getId() {
         return id;

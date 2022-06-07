@@ -4,7 +4,7 @@ public class ResponseObject {
     private Status status;
     private String message;
     private Object data;
-    public static enum Status{
+    public enum Status{
         STATUS_OK, STATUS_FAILED
     }
 

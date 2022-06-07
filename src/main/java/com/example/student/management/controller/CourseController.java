@@ -44,31 +44,45 @@ public class CourseController {
 
     @GetMapping("/countAllCourses")
     ResponseEntity<ResponseObject> countAllCourses(){
-        int numberOfCourses = courseRepository.countAllId();
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject(numberOfCourses, "Number of courses", ResponseObject.Status.STATUS_OK));
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(courseRepository.countAllId(),
+                "Number of courses", ResponseObject.Status.STATUS_OK));
     }
 
     @PostMapping("/insertCourse")
     ResponseEntity<ResponseObject> insertCourse(@RequestBody Course course) {
-        return getCourseById(course.getId()).getBody().getStatus() == ResponseObject.Status.STATUS_FAILED ?
-                ResponseEntity.status(HttpStatus.OK).body(
-                        new ResponseObject(courseRepository.save(course), "Course's inserted",
-                                ResponseObject.Status.STATUS_OK))
-                : ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject(course, "Course's already existed",
-                        ResponseObject.Status.STATUS_FAILED));
+        boolean isDepartmentIdExist = courseRepository.existsByDepartmentId(course.getDepartmentId());
+        if (!courseRepository.existsById(course.getId()) && isDepartmentIdExist) {
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject(courseRepository.save(course), "Course's inserted",
+                            ResponseObject.Status.STATUS_OK));
+        }
+        if (!isDepartmentIdExist) {
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject(course, "Course's department id is not exist",
+                            ResponseObject.Status.STATUS_OK));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseObject(course, "Course's already exist", ResponseObject.Status.STATUS_OK));
     }
 
     @PutMapping("/updateCourse")
     ResponseEntity<ResponseObject> updateCourse(@RequestBody Course course) {
-        return getCourseById(course.getId()).getBody().getStatus() == ResponseObject.Status.STATUS_OK ?
-                ResponseEntity.status(HttpStatus.OK).body(
-                        new ResponseObject(courseRepository.save(course), "Course's updated",
-                                ResponseObject.Status.STATUS_OK))
-                : ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject(course, "Course's not existed",
-                        ResponseObject.Status.STATUS_FAILED));
+        boolean isDepartmentIdExist = courseRepository.existsByDepartmentId(course.getDepartmentId());
+
+        if (courseRepository.existsById(course.getId()) && isDepartmentIdExist) {
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(courseRepository.save(course),
+                    "Course's updated", ResponseObject.Status.STATUS_OK));
+        }
+
+        if (!isDepartmentIdExist) {
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject(course, "Course's department id is not exist",
+                            ResponseObject.Status.STATUS_OK));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseObject(course, "Course's not exist", ResponseObject.Status.STATUS_OK));
     }
 
     @DeleteMapping("deleteCourseById/{id}")
