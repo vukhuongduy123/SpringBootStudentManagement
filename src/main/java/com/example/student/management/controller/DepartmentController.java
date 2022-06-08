@@ -2,7 +2,7 @@ package com.example.student.management.controller;
 
 import com.example.student.management.models.Department;
 import com.example.student.management.models.ResponseObject;
-import com.example.student.management.repositories.DepartmentRepository;
+import com.example.student.management.service.DepartmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,17 +15,17 @@ import java.util.Optional;
 @RequestMapping(path ="/api/department")
 public class DepartmentController {
     @Autowired
-    private DepartmentRepository departmentRepository;
+    private DepartmentService departmentService;
 
     @GetMapping("/getAllDepartments")
     ResponseEntity<ResponseObject> getAllDepartments() {
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject(departmentRepository.findAll(), "List of departments", ResponseObject.Status.STATUS_OK));
+                new ResponseObject(departmentService.getAllDepartments(), "List of departments", ResponseObject.Status.STATUS_OK));
     }
 
     @GetMapping("/getDepartmentById/{id}")
     ResponseEntity<ResponseObject> getDepartmentById(@PathVariable int id) {
-        Optional<Department> department = departmentRepository.findById(id);
+        Optional<Department> department = departmentService.getDepartmentById(id);
 
         return department.isPresent() ? ResponseEntity.status(HttpStatus.FOUND).body(
                 new ResponseObject(department, "Department found", ResponseObject.Status.STATUS_OK))
@@ -35,7 +35,7 @@ public class DepartmentController {
 
     @GetMapping("/getDepartmentByName/{name}")
     ResponseEntity<ResponseObject> getDepartmentByName(@PathVariable String name) {
-        List<Department> department = departmentRepository.findByName(name);
+        List<Department> department = departmentService.getDepartmentByName(name);
 
         return department.size() > 0 ? ResponseEntity.status(HttpStatus.FOUND).body(
                 new ResponseObject(department, "Departments found", ResponseObject.Status.STATUS_OK))
@@ -44,39 +44,34 @@ public class DepartmentController {
     }
 
     @GetMapping("/countAllDepartments")
-    ResponseEntity<ResponseObject> countAllDepartments(){
+    ResponseEntity<ResponseObject> countAllDepartments() {
         return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject(departmentRepository.countAllId(),
+                new ResponseObject(departmentService.countAllDepartments(),
                         "Number of departments", ResponseObject.Status.STATUS_OK));
     }
 
     @PostMapping("/insertDepartment")
     ResponseEntity<ResponseObject> insertDepartment(@RequestBody Department department) {
-        return departmentRepository.existsById(department.getId())
-                ? ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(departmentRepository.save(department),
-                        "Department's inserted", ResponseObject.Status.STATUS_OK))
+        return departmentService.insertDepartment(department) > 0
+                ? ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(departmentService.insertDepartment(department),
+                "Department's inserted", ResponseObject.Status.STATUS_OK))
                 : ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(department, "Department's already existed",
-                        ResponseObject.Status.STATUS_FAILED));
+                ResponseObject.Status.STATUS_FAILED));
     }
 
     @PutMapping("/updateDepartment")
     ResponseEntity<ResponseObject> updateDepartment(@RequestBody Department department) {
-        return departmentRepository.existsById(department.getId())
-                ? ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(departmentRepository.save(department),
+        return departmentService.updateDepartment(department) > 0
+                ? ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(departmentService.updateDepartment(department),
                 "Department's updated", ResponseObject.Status.STATUS_OK))
                 : ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(department, "Department's not existed",
-                        ResponseObject.Status.STATUS_FAILED));
+                ResponseObject.Status.STATUS_FAILED));
     }
 
     @DeleteMapping("deleteDepartmentById/{id}")
     ResponseEntity<ResponseObject> deleteDepartment(@PathVariable int id) {
-        if (departmentRepository.existsById(id)) {
-            departmentRepository.deleteById(id);
-            return ResponseEntity.status(HttpStatus.FOUND).body(
-                    new ResponseObject(departmentRepository.findById(id), "Department's deleted",
-                            ResponseObject.Status.STATUS_OK));
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                new ResponseObject("", "Department's not exist", ResponseObject.Status.STATUS_FAILED));
+        departmentService.deleteDepartment(id);
+        return ResponseEntity.status(HttpStatus.FOUND).body(
+                new ResponseObject("", "department's deleted", ResponseObject.Status.STATUS_OK));
     }
 }

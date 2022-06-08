@@ -2,7 +2,7 @@ package com.example.student.management.controller;
 
 import com.example.student.management.models.ResponseObject;
 import com.example.student.management.models.Student;
-import com.example.student.management.repositories.StudentRepository;
+import com.example.student.management.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +16,11 @@ import java.util.Optional;
 @RequestMapping(path = "/api/student")
 public class StudentController {
     @Autowired
-    private StudentRepository studentRepository;
+    private StudentService studentService;
 
     @GetMapping("/getAllStudents")
-    ResponseEntity<ResponseObject> getAllStudents() {
-        List<Student> students = studentRepository.findAll();
+    public ResponseEntity<ResponseObject> getAllStudents() {
+        List<Student> students = studentService.getAllStudents();
         return students.isEmpty() ? ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseObject(students, "There aren't any students", ResponseObject.Status.STATUS_OK))
                 : ResponseEntity.status(HttpStatus.OK).body(
@@ -29,7 +29,7 @@ public class StudentController {
 
     @GetMapping("/getStudentById/{id}")
     ResponseEntity<ResponseObject> getStudentFromId(@PathVariable int id) {
-        Optional<Student> student = studentRepository.findById(id);
+        Optional<Student> student = studentService.getStudentFromId(id);
 
         return student.isPresent() ? ResponseEntity.status(HttpStatus.FOUND).body(
                 new ResponseObject(student, "Student found", ResponseObject.Status.STATUS_OK))
@@ -39,7 +39,7 @@ public class StudentController {
 
     @GetMapping("/getStudentByName/{name}")
     ResponseEntity<ResponseObject> getStudentByName(@PathVariable String name) {
-        List<Student> students = studentRepository.findByName(name);
+        List<Student> students = studentService.getStudentByName(name);
 
         return students.size() > 0 ? ResponseEntity.status(HttpStatus.FOUND).body(
                 new ResponseObject(students, "Students found", ResponseObject.Status.STATUS_OK))
@@ -49,7 +49,7 @@ public class StudentController {
 
     @GetMapping("/getStudentByDepartmentId/{id}")
     ResponseEntity<ResponseObject> getStudentByDepartmentId(@PathVariable int id) {
-        List<Student> students = studentRepository.findByDepartmentId(id);
+        List<Student> students = studentService.getStudentByDepartmentId(id);
 
         return students.size() > 0 ? ResponseEntity.status(HttpStatus.FOUND).body(
                 new ResponseObject(students, "Students found", ResponseObject.Status.STATUS_OK))
@@ -59,40 +59,32 @@ public class StudentController {
 
     @GetMapping("/countAllStudents")
     ResponseEntity<ResponseObject> countAllStudents(){
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(studentRepository.countAll(),
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(studentService.countAllStudents(),
                 "Number of students", ResponseObject.Status.STATUS_OK));
     }
 
     @GetMapping("/countStudentsFromDeparted/{id}")
-    @Transactional(readOnly = true)
     public ResponseEntity<ResponseObject> countStudentsFromDeparted(@PathVariable int id){
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(studentRepository.CountStudentsFromDeparted(id),
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(studentService.countStudentsFromDeparted(id),
                 "Number of students", ResponseObject.Status.STATUS_OK));
     }
 
     @PostMapping("/insertStudent")
     ResponseEntity<ResponseObject> insertStudent(@RequestBody Student student) {
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(studentRepository.insert(
-                student.getId(), student.getName(), student.isGender(), student.getDob(), student.getDepartmentId()),
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(studentService.insertStudent(student),
                 "Student's inserted", ResponseObject.Status.STATUS_OK));
     }
 
     @PutMapping("/updateStudent")
     ResponseEntity<ResponseObject> updateStudent(@RequestBody Student student) {
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(studentRepository.update(
-                student.getId(), student.getName(), student.isGender(), student.getDob(), student.getDepartmentId()),
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(studentService.updateStudent(student),
                 "Student's updated", ResponseObject.Status.STATUS_OK));
-
     }
 
     @DeleteMapping("deleteStudentById/{id}")
     ResponseEntity<ResponseObject> deleteStudent(@PathVariable int id) {
-        //if (studentRepository.existsById(id)) {
-            studentRepository.deleteById(id);
-            return ResponseEntity.status(HttpStatus.FOUND).body(
-                    new ResponseObject("", "Student's deleted", ResponseObject.Status.STATUS_OK));
-        //}
-       // return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-               // new ResponseObject("", "Student's not exist", ResponseObject.Status.STATUS_FAILED));
+        studentService.deleteStudent(id);
+        return ResponseEntity.status(HttpStatus.FOUND).body(
+                new ResponseObject("", "Student's deleted", ResponseObject.Status.STATUS_OK));
     }
 }

@@ -14,7 +14,6 @@ public class ResponseObject {
         this.status = status;
     }
 
-
     public Object getData() {
         return data;
     }

@@ -9,9 +9,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import java.sql.Date;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +17,6 @@ import java.util.Map;
 public interface StudentRepository extends JpaRepository<Student,Integer> {
     List<Student> findByName(String name);
     List<Student> findByDepartmentId(int departmentId);
-    boolean existsByDepartmentId(int departmentId);
 
     @Modifying
     @Transactional
