@@ -1,28 +1,28 @@
 package com.example.student.management.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
-    private static final String USER = "USER";
-    private static final String ADMIN = "ADMIN";
+    public static final String USER = "USER";
+    public static final String ADMIN = "ADMIN";
+
+    @Autowired
+    UserDetailsService userDetailsService;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication()
-                .withUser("VuKhuongDuy")
-                .password("123")
-                .roles(USER)
-                .and()
-                .withUser("duyvk")
-                .password("123")
-                .roles(ADMIN);
+        auth.userDetailsService(userDetailsService);
     }
 
     @Bean
@@ -33,7 +33,14 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/").permitAll()
+                .antMatchers("/api/student/getAllStudents").hasRole(ADMIN)
+                .antMatchers("/api/student/countAllStudents").hasRole(ADMIN)
+                .antMatchers("/api/student/countStudentsFromDeparted").hasRole(ADMIN)
+                .antMatchers("/api/student/insertStudent").hasRole(ADMIN)
+                .antMatchers("/api/student/updateStudent").hasRole(ADMIN)
+                .antMatchers("/api/student/deleteStudent").hasRole(ADMIN)
+                .antMatchers("/api/student/getStudentById").hasAnyRole()
+                .antMatchers("/api/student/getStudentByName").hasAnyRole()
                 .and()
                 .formLogin();
     }

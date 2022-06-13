@@ -2,11 +2,12 @@ package com.example.student.management.controller;
 
 import com.example.student.management.models.ResponseObject;
 import com.example.student.management.models.Student;
+import com.example.student.management.security.UserDetailServiceImpl;
 import com.example.student.management.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +18,8 @@ import java.util.Optional;
 public class StudentController {
     @Autowired
     private StudentService studentService;
+    @Autowired
+    private UserDetailServiceImpl userDetailServiceImpl;
 
     @GetMapping("/getAllStudents")
     public ResponseEntity<ResponseObject> getAllStudents() {
@@ -28,7 +31,8 @@ public class StudentController {
     }
 
     @GetMapping("/getStudentById/{id}")
-    ResponseEntity<ResponseObject> getStudentFromId(@PathVariable int id) {
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or @userDetailServiceImpl.isMatchedId(#id)")
+    public ResponseEntity<ResponseObject> getStudentFromId(@PathVariable int id) {
         Optional<Student> student = studentService.getStudentFromId(id);
 
         return student.isPresent() ? ResponseEntity.status(HttpStatus.FOUND).body(
