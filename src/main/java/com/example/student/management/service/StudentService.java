@@ -36,7 +36,7 @@ public class StudentService {
     }
 
     @Transactional(readOnly = true)
-    public List<Object> countStudentsFromDeparted( int id){
+    public int countStudentsFromDeparted(int id){
         return studentRepository.CountStudentsFromDeparted(id);
     }
 
@@ -52,5 +52,9 @@ public class StudentService {
 
     public void deleteStudent(int id) {
         studentRepository.deleteById(id);
+    }
+
+    public boolean existById(int id) {
+        return studentRepository.existsById(id);
     }
 }

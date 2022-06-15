@@ -53,7 +53,7 @@ public class DepartmentController {
     @PostMapping("/insertDepartment")
     ResponseEntity<ResponseObject> insertDepartment(@RequestBody Department department) {
         return departmentService.insertDepartment(department) > 0
-                ? ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(departmentService.insertDepartment(department),
+                ? ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(department,
                 "Department's inserted", ResponseObject.Status.STATUS_OK))
                 : ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(department, "Department's already existed",
                 ResponseObject.Status.STATUS_FAILED));
@@ -70,8 +70,15 @@ public class DepartmentController {
 
     @DeleteMapping("deleteDepartmentById/{id}")
     ResponseEntity<ResponseObject> deleteDepartment(@PathVariable int id) {
-        departmentService.deleteDepartment(id);
-        return ResponseEntity.status(HttpStatus.FOUND).body(
-                new ResponseObject("", "department's deleted", ResponseObject.Status.STATUS_OK));
+        if (departmentService.isExistedId(id) && departmentService.getStudentService().countStudentsFromDeparted(id) == 0) {
+            departmentService.deleteDepartment(id);
+            return ResponseEntity.status(HttpStatus.FOUND).body(
+                    new ResponseObject("", "department's deleted", ResponseObject.Status.STATUS_OK));
+        }
+        if (departmentService.getStudentService().countStudentsFromDeparted(id) > 0)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    new ResponseObject("", "there are students in department", ResponseObject.Status.STATUS_FAILED));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new ResponseObject("", "department's id not exist", ResponseObject.Status.STATUS_FAILED));
     }
 }

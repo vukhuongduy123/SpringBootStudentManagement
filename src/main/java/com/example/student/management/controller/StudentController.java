@@ -75,8 +75,13 @@ public class StudentController {
 
     @PostMapping("/insertStudent")
     ResponseEntity<ResponseObject> insertStudent(@RequestBody Student student) {
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(studentService.insertStudent(student),
-                "Student's inserted", ResponseObject.Status.STATUS_OK));
+        if(studentService.existById(student.getId())) {
+            studentService.insertStudent(student);
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(student,
+                    "Student's inserted", ResponseObject.Status.STATUS_OK));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("",
+                "Student's already existed", ResponseObject.Status.STATUS_FAILED));
     }
 
     @PutMapping("/updateStudent")

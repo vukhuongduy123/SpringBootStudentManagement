@@ -1,13 +1,9 @@
 package com.example.student.management.service;
 
 import com.example.student.management.models.Department;
-import com.example.student.management.models.ResponseObject;
 import com.example.student.management.repositories.DepartmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +11,9 @@ import java.util.Optional;
 @Service
 public class DepartmentService {
     @Autowired
-    DepartmentRepository departmentRepository;
+    private DepartmentRepository departmentRepository;
+    @Autowired
+    private StudentService studentService;
 
     public List<Department> getAllDepartments() {
         return departmentRepository.findAll();
@@ -43,6 +41,14 @@ public class DepartmentService {
 
     public void deleteDepartment(int id) {
             departmentRepository.deleteById(id);
+    }
+
+    public boolean isExistedId(int id) {
+        return departmentRepository.existsById(id);
+    }
+
+    public StudentService getStudentService() {
+        return studentService;
     }
 }
 

@@ -13,21 +13,11 @@ import java.util.stream.Collectors;
 public class UserDetailsImpl implements UserDetails {
     private String name;
     private String pass;
-    private int studentId;
     private List<GrantedAuthority> authorities;
-
-    public int getStudentId() {
-        return studentId;
-    }
-
-    public void setStudentId(int studentId) {
-        this.studentId = studentId;
-    }
 
     public UserDetailsImpl(Users user) {
         name = user.getName();
         pass = user.getPass();
-        studentId = user.getStudentId();
         authorities = Arrays.stream(user.getRoles().split(","))
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());

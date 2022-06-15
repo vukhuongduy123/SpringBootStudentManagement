@@ -36,5 +36,5 @@ public interface StudentRepository extends JpaRepository<Student,Integer> {
     Map<Integer,String> countAll();
 
     @Procedure(name = "CountStudentsFromDeparted", procedureName = "dbo.CountStudentsFromDeparted")
-    List<Object> CountStudentsFromDeparted(@Param("departmentId") int departmentId);
+    int CountStudentsFromDeparted(@Param("departmentId") int departmentId);
 }

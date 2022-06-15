@@ -32,7 +32,10 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
+        http.httpBasic()
+                .and()
+                .authorizeRequests()
+                .antMatchers("/api/department/insertDepartment").hasAnyRole()
                 .antMatchers("/api/student/getAllStudents").hasRole(ADMIN)
                 .antMatchers("/api/student/countAllStudents").hasRole(ADMIN)
                 .antMatchers("/api/student/countStudentsFromDeparted").hasRole(ADMIN)
@@ -42,6 +45,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/student/getStudentById").hasAnyRole()
                 .antMatchers("/api/student/getStudentByName").hasAnyRole()
                 .and()
+                .csrf().disable()
                 .formLogin();
     }
 }

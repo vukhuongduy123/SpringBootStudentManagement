@@ -21,7 +21,6 @@ public class FileService {
     public final String INPUT_PATH = "E:\\Self Study Course\\java\\management\\src\\main\\resources\\templates\\excel-report-template\\student_template.xls";
     public final String OUTPUT_PATH = "E:\\Self Study Course\\java\\management\\src\\main\\resources\\templates\\excel-report-template\\target\\output_student_template.xls";
     public final String UPLOAD_PATH = "E:\\Self Study Course\\java\\management\\src\\main\\resources\\templates\\upload";
-    public final String DOWNLOAD_PATH = "E:\\Self Study Course\\java\\management\\src\\main\\resources\\templates\\download";
 
     public boolean exportStudents(List<Student> students) {
         try {
