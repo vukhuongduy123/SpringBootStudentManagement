@@ -18,14 +18,6 @@ public class Users {
     @JoinColumn
     int studentId;
 
-    public Users(int id, String name, String pass, String roles, int studentId) {
-        this.id = id;
-        this.name = name;
-        this.pass = pass;
-        this.roles = roles;
-        this.studentId = studentId;
-    }
-
     public Users() {}
 
     public int getId() {

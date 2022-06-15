@@ -58,14 +58,4 @@ public class Student {
         this.departmentId = departmentId;
     }
 
-    @Override
-    public String toString() {
-        return "Student{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", gender=" + gender +
-                ", dob='" + dob + '\'' +
-                ", departmentId=" + departmentId +
-                '}';
-    }
 }
